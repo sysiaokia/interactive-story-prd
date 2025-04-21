@@ -49,20 +49,20 @@ public/
 - 框架分类支持七种固定类型：**world、era、technology、rules、race、politics、conflict**
 - 点击框架显示详情弹窗，包含更多信息和购买按钮
 - 购买流程：确认、支付、结果展示
-- 已拥有框架显示"已拥有"状态，VIP专属框架为非VIP用户显示锁定状态
+- 已拥有框架显示"已拥有"状态，VIP专属框架为非VIP用户显示VIP专属标记
 
 ### 3.3 VIP会员
 
 - 展示VIP会员特权和价格
 - 支持购买/续费VIP会员，**固定周期为30天**
 - 显示VIP到期时间和状态
-- VIP特权框架专区，仅VIP可见
+- VIP特权：普通世界框架在世界选择界面可通过unlockmanager解锁，有效期内随便使用，商店仍正常提供购买
 - VIP购买确认和支付流程
 
 ### 3.4 高级组合包
 
 - 展示**固定组合好的高级框架组合包**（非VIP专属）
-- 组合包内容包含多个高级框架
+- 组合包内容包含多个高级框架，不是单个高级框架
 - 组合包详情展示，包含所有包含框架
 - 组合包购买流程和确认
 - 已拥有组合包的展示逻辑
@@ -101,7 +101,8 @@ public/
 ### 4.2 卡片组件
 
 - 统一的卡片设计，类名统一用 ui-card-* 前缀
-- 卡片包含标题、价格、购买按钮
+- 普通框架卡片包含：名称、价格、已拥有/未拥有状态
+- 组合包卡片包含：名称、描述、价格、包含框架列表、已拥有/未拥有状态
 - 卡片悬停效果和点击动画
 - 不同状态（可购买、已拥有、VIP专属）的视觉区分
 - 支持批量渲染和虚拟列表技术
@@ -120,7 +121,50 @@ public/
 
 ## 5. 数据结构与管理
 
-### 5.1 框架数据结构
+### 5.1 数据来源
+
+所有数据必须从Firebase数据库中实时获取，严禁硬编码任何框架、价格或其他数据：
+
+- **数据库位置**：TheStoryBegins集合 > Selection文档
+- **数据存储方式**：各类数据以字段数组形式存储，需动态读取，禁止硬编码
+
+#### 5.1.1 普通框架数据来源
+- 位置：数据库TheStoryBegins集合 > Selection文档 > 7大框架字段
+  - Worlds（世界框架）
+  - Era（时代框架）
+  - TechnologyLevel（技术框架）
+  - CoreRules（规则框架）
+  - MainRace（种族框架）
+  - PoliticalSystem（政治框架）
+  - Conflict（冲突框架）
+- 形式：每个字段为数组，包含多个框架数据，与组合包无关
+
+#### 5.1.2 框架价格数据来源
+- 位置：数据库TheStoryBegins集合 > Selection文档 > WorldFrameworkPrice字段
+- 形式：数组格式，"框架前缀-价格"形式存储（如"Worlds-价格"）
+- 解析：使用代码函数解析价格数据，严格按world-data-manager.mdc规则执行
+
+#### 5.1.3 VIP会员数据来源
+- 位置：数据库TheStoryBegins集合 > Selection文档 > VIPMemberPrice字段
+- 形式：数组格式，下标0为月会员价格（固定30天）
+- 备注：后续可能启用数组1作为年会员价格（暂不支持）
+
+#### 5.1.4 组合包数据来源
+- 位置：数据库TheStoryBegins集合 > Selection文档 > Package相关字段
+  - PackageConflict
+  - PackageCoreRules
+  - PackageEra
+  - PackageMainRace
+  - PackagePoliticalSystem
+  - PackageTechnologyLevel
+  - PackageWorlds
+- 形式：每个字段数组0为一个固定组合包的相应框架
+
+#### 5.1.5 组合包价格数据来源
+- 位置：数据库TheStoryBegins集合 > Selection文档 > PackagePrice字段
+- 形式：数组格式，下标对应组合包编号（数组0对应组合包0，1对应1）
+
+### 5.2 框架数据结构
 
 ```
 {
@@ -129,16 +173,16 @@ public/
   category: string,   // "world"、"era"、"technology"等七种固定类型
   type: "normal" | "premium", // 普通/高级
   isVIP: boolean,     // 是否VIP专属
-  price: number,      // 价格
+  price: number,      // 价格（通过框架前缀-价格形式从WorldFrameworkPrice解析）
   owned: boolean,     // 是否已拥有
 }
 ```
 
-### 5.2 VIP会员数据结构
+### 5.3 VIP会员数据结构
 
 ```
 {
-  price: number,      // VIP价格
+  price: number,      // VIP价格（从VIPMemberPrice字段数组0获取）
   duration: 30,       // 固定30天
   benefits: string[], // 特权描述
   isActive: boolean,  // 是否激活
@@ -146,20 +190,20 @@ public/
 }
 ```
 
-### 5.3 组合包数据结构
+### 5.4 组合包数据结构
 
 ```
 {
   id: string,         // 组合包ID
   name: string,       // 组合包名称
-  description: string, // 组合包描述
-  price: number,      // 组合包价格
-  frameworks: string[], // 包含的框架ID列表
+  description: string, // 组合包描述（仅组合包需要描述，普通框架不需要）
+  price: number,      // 组合包价格（从PackagePrice字段相应数组索引获取）
+  frameworks: string[], // 包含的框架ID列表（从Package相关字段获取）
   isOwned: boolean    // 是否已拥有
 }
 ```
 
-### 5.4 用户资产数据结构
+### 5.5 用户资产数据结构
 
 ```
 {
@@ -176,7 +220,7 @@ public/
 }
 ```
 
-### 5.5 订单数据结构
+### 5.6 订单数据结构
 
 ```
 {
@@ -192,14 +236,16 @@ public/
 }
 ```
 
-### 5.6 数据获取策略
+### 5.7 数据获取策略
 
 - 框架数据和价格数据**优先从本地缓存获取**
-  - 框架数据通过 `window.WorldFrameworks` 获取
-  - 价格数据通过 `window.CommonDataCache.getPriceData()` 获取
-- 缓存失效或不存在时，才从服务器拉取
-- 本地缓存加签名和过期时间（12小时），读取时验证
+  - 框架数据通过 `window.WorldFrameworks`（由WorldDataManager从Firebase加载并解析）
+  - 价格数据通过 `window.CommonDataCache.getPriceData()`（由价格管理模块从Firebase加载并解析）
+- 缓存失效或不存在时，才重新从Firebase数据库拉取
+- 所有数据缓存必须遵循CacheManager.mdc规定的统一缓存管理规则
+- 缓存相关的配置、过期时间、签名、加密等全部由CacheManager统一处理
 - 数据刷新使用指数退避策略，有频率限制
+- 严禁任何形式的硬编码数据，所有数据必须从数据库动态获取
 
 ## 6. 事件系统
 
@@ -241,7 +287,7 @@ public/
 
 1. 初始化Shop.Core单例，创建全局状态
 2. 检查用户认证状态（Shop.Auth）
-3. 加载框架和价格数据（优先缓存）
+3. 从Firebase数据库加载框架和价格数据（优先使用缓存）
 4. 分类框架数据（七个固定类别）
 5. 默认选中"world"类别
 6. 渲染UI，显示框架卡片
