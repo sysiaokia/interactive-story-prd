@@ -2,7 +2,7 @@
 
 ## 1. 概述
 
-新商店模块是游戏内购买框架、VIP会员、高级套餐的统一入口，全新实现原有商店的所有功能，但使用更现代化的架构和更清晰的代码组织。实现严格遵循MDC规则，包括认证、事件系统、数据管理、UI组件、安全机制等。
+新商店模块是游戏内购买框架、VIP会员、高级组合包的统一入口，全新实现原有商店的所有功能，但使用更现代化的架构和更清晰的代码组织。实现严格遵循MDC规则，包括认证、事件系统、数据管理、UI组件、安全机制等。
 
 ## 2. 目录结构
 
@@ -37,7 +37,7 @@ public/
 
 ### 3.1 商店主页
 
-- 提供框架展示区、VIP会员区、高级套餐区、订单历史四大核心区域
+- 提供框架展示区、VIP会员区、高级组合包区、订单历史四大核心区域
 - **默认展示"世界框架"(world类别)** 作为首个展示的框架类型
 - 支持根据用户状态（游客/登录/VIP）显示不同内容
 - 实现顶部导航栏，包含分类切换功能
@@ -45,7 +45,7 @@ public/
 
 ### 3.2 框架展示与购买
 
-- 展示所有可购买框架，包含图片、名称、描述、价格
+- 展示所有可购买框架，包含名称、价格
 - 框架分类支持七种固定类型：**world、era、technology、rules、race、politics、conflict**
 - 点击框架显示详情弹窗，包含更多信息和购买按钮
 - 购买流程：确认、支付、结果展示
@@ -59,13 +59,13 @@ public/
 - VIP特权框架专区，仅VIP可见
 - VIP购买确认和支付流程
 
-### 3.4 高级套餐
+### 3.4 高级组合包
 
-- 展示**固定组合好的高级框架套餐**（非VIP专属）
-- 套餐内容包含多个高级框架
-- 套餐详情展示，包含所有包含框架
-- 套餐购买流程和确认
-- 已拥有套餐的展示逻辑
+- 展示**固定组合好的高级框架组合包**（非VIP专属）
+- 组合包内容包含多个高级框架
+- 组合包详情展示，包含所有包含框架
+- 组合包购买流程和确认
+- 已拥有组合包的展示逻辑
 
 ### 3.5 订单历史
 
@@ -101,7 +101,7 @@ public/
 ### 4.2 卡片组件
 
 - 统一的卡片设计，类名统一用 ui-card-* 前缀
-- 卡片包含图片、标题、描述、价格、购买按钮
+- 卡片包含标题、价格、购买按钮
 - 卡片悬停效果和点击动画
 - 不同状态（可购买、已拥有、VIP专属）的视觉区分
 - 支持批量渲染和虚拟列表技术
@@ -126,13 +126,11 @@ public/
 {
   id: string,         // 如 "world_1"
   name: string,       // 显示名称
-  description: string, // 描述
   category: string,   // "world"、"era"、"technology"等七种固定类型
   type: "normal" | "premium", // 普通/高级
   isVIP: boolean,     // 是否VIP专属
   price: number,      // 价格
   owned: boolean,     // 是否已拥有
-  imageUrl: string    // 图片路径
 }
 ```
 
@@ -148,15 +146,14 @@ public/
 }
 ```
 
-### 5.3 套餐数据结构
+### 5.3 组合包数据结构
 
 ```
 {
-  id: string,         // 套餐ID
-  name: string,       // 套餐名称
-  description: string, // 套餐描述
-  imageUrl: string,   // 套餐图片
-  price: number,      // 套餐价格
+  id: string,         // 组合包ID
+  name: string,       // 组合包名称
+  description: string, // 组合包描述
+  price: number,      // 组合包价格
   frameworks: string[], // 包含的框架ID列表
   isOwned: boolean    // 是否已拥有
 }
@@ -170,7 +167,7 @@ public/
   coins: number,
   diamonds: number,
   ownedFrameworks: string[], // 拥有的框架ID
-  ownedPackages: string[],   // 拥有的套餐ID
+  ownedPackages: string[],   // 拥有的组合包ID
   vipStatus: {
     isActive: boolean,
     expiryDate: string      // ISO日期
@@ -310,7 +307,6 @@ public/
 
 - 使用DocumentFragment减少DOM操作，降低重排重绘
 - 应用虚拟列表技术，只渲染可视区域的卡片
-- 图片懒加载和预加载机制
 - 本地缓存频繁访问的数据，减少网络请求
 - 检测设备性能，低端设备自动降级动画效果
 
