@@ -15,7 +15,7 @@ public/
       │   │   ├── shop-core.js       # 商店主流程与入口
       │   │   ├── shop-auth.js       # 商店认证与会话管理
       │   │   ├── shop-events.js     # 事件系统
-      │   │   └── shop-transaction-core.js # 交易核心
+      │   │   └── shop-transaction-core.js # 交易核心*弃用由全局TransactionCore.js替代*
       │   ├── components/    # UI组件
       │   │   ├── shop-cards.js      # 商品卡片组件
       │   │   ├── shop-buttons.js    # 按钮组件
