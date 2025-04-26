@@ -14,6 +14,20 @@
 
 - **src/services/ai/ResponseHandler.ts**: AI响应处理，解析AI生成的内容并提取选项、战斗触发条件和行为评分。
 
+## 事件系统
+
+- **src/services/core/EventBus.ts**: 事件总线，提供全局统一的事件发布/订阅系统，实现模块间松耦合通信，支持基于优先级的事件监听和处理。
+
+- **src/hooks/useEvent.ts**: 事件钩子，封装事件监听、触发和清理逻辑，简化组件内事件处理。
+
+## 全局状态管理
+
+- **src/contexts/GlobalState.tsx**: 全局状态上下文，提供应用级状态管理，实现各模块间共享数据的存储和访问。
+
+- **src/hooks/useGlobalState.ts**: 全局状态钩子，提供组件级别全局状态访问和更新功能。
+
+- **src/services/state/StateManager.ts**: 状态管理服务，处理复杂状态逻辑，包括状态持久化、变更追踪和调试支持。
+
 ## UI组件与Hooks
 
 - **src/components/common/NotificationSystem.tsx**: 通知系统组件，负责显示系统通知、错误提示和操作反馈。
@@ -43,6 +57,52 @@
 - **src/pages/Lobby.tsx**: 大厅页面，负责大厅界面渲染、事件处理和世界选择流程，集成各类大厅功能组件。
 
 - **src/contexts/LobbyContext.tsx**: 大厅上下文，提供大厅状态管理，用户资产数据和框架选择状态。
+
+## 工具函数库
+
+- **src/utils/platform/**: 平台工具，处理不同设备和浏览器环境差异，提供一致性接口。
+
+- **src/utils/templates/**: 模板工具，处理动态模板渲染和内容填充。
+
+- **src/utils/integrations/**: 第三方集成工具，封装外部服务接口调用和数据转换。
+
+- **src/utils/shop/shopUtils.ts**: 商店工具集，提供商店相关辅助函数。
+
+## 类型定义
+
+- **src/types/auth.ts**: 认证相关类型，定义用户、会话和认证流程的接口和类型。
+
+- **src/types/game.ts**: 游戏相关类型，定义游戏状态、玩家属性和游戏流程的接口。
+
+- **src/types/frameworks.ts**: 框架相关类型，定义世界框架、类别和配置的接口。
+
+- **src/types/shop.ts**: 商店相关类型，定义商品、价格和交易的接口和类型。
+
+- **src/types/save.ts**: 存档相关类型，定义存档结构和操作的接口和类型。
+
+## 样式系统
+
+- **src/styles/variables.scss**: 全局样式变量，定义主题颜色、字体和间距等基础样式常量。
+
+- **src/styles/global.scss**: 全局样式，提供应用通用样式规则和重置样式。
+
+- **src/styles/components/**: 组件样式，定义各通用组件的样式模块。
+
+- **src/styles/pages/**: 页面样式，定义各页面特定的样式模块。
+
+- **src/styles/responsive/**: 响应式样式，提供不同设备和分辨率的样式适配规则。
+
+- **src/hooks/useResponsive.ts**: 响应式钩子，提供窗口大小监听和断点检测功能。
+
+## 常量定义
+
+- **src/constants/app.ts**: 应用常量，定义应用级配置项和不变量。
+
+- **src/constants/events.ts**: 事件常量，定义所有事件名称和事件类型。
+
+- **src/constants/api.ts**: API常量，定义API端点和请求配置。
+
+- **src/constants/ui.ts**: UI常量，定义UI相关配置项和默认值。
 
 ## 工具与服务
 
@@ -76,6 +136,34 @@
 
 - **src/services/auth/AuthService.ts**: 认证服务，处理用户登录、注册、会话维护和匿名账户升级。
 
+## 多平台适配
+
+- **src/utils/platform/DeviceDetector.ts**: 设备检测工具，识别用户设备类型和性能参数。
+
+- **src/hooks/useDeviceInfo.ts**: 设备信息钩子，提供组件级设备信息访问和适配功能。
+
+- **src/styles/responsive/breakpoints.scss**: 断点定义，设置响应式布局的尺寸断点。
+
+## 离线同步
+
+- **src/services/sync/NetworkManager.ts**: 网络管理器，监测网络状态变化并触发相应事件。
+
+- **src/services/sync/SyncManager.ts**: 同步管理器，处理在线/离线状态切换和数据同步。
+
+- **src/services/sync/OfflineQueue.ts**: 离线队列，存储离线状态下的操作，在恢复连接时执行。
+
+- **src/hooks/useNetworkStatus.ts**: 网络状态钩子，提供组件级网络状态监测和响应功能。
+
+- **src/hooks/useOfflineSync.ts**: 离线同步钩子，处理组件级离线数据的缓存和同步。
+
+## 错误处理系统
+
+- **src/services/utils/ErrorHandler.ts**: 错误处理器，统一处理和记录应用异常。
+
+- **src/services/utils/LoggerService.ts**: 日志服务，提供分级日志记录和上报功能。
+
+- **src/hooks/useErrorBoundary.ts**: 错误边界钩子，提供组件级错误捕获和恢复功能。
+
 ## 商店组件和服务
 
 - **src/features/shop/ShopCore.tsx**: 商店核心组件，提供商店页面的主体结构和状态管理。
@@ -100,8 +188,6 @@
 
 - **src/hooks/useShopSync.ts**: 商店同步钩子，处理多标签页和多设备间的数据一致性。
 
-- **src/utils/shop/shopUtils.ts**: 商店工具集，提供商店相关辅助函数。
-
 - **src/services/shop/RefreshService.ts**: 数据刷新服务，处理商店数据的定时更新和错误恢复。
 
 - **src/components/shop/ShopButtons.tsx**: 按钮组件，处理商店内各类按钮的渲染和点击事件。
@@ -113,6 +199,16 @@
 - **src/components/shop/WorldsUI.tsx**: 世界商店组件，处理世界框架的商店展示界面。
 
 - **src/hooks/usePurchaseStatus.ts**: 购买状态钩子，跟踪和通知购买流程状态变化。
+
+## VIP与会员模块
+
+- **src/services/shop/VIPService.ts**: VIP服务，管理VIP会员状态、权益和过期逻辑。
+
+- **src/services/shop/PackageService.ts**: 套餐服务，处理高级框架包的数据和购买逻辑。
+
+- **src/hooks/useVIP.ts**: VIP钩子，提供组件级VIP状态访问和操作功能。
+
+- **src/hooks/usePackage.ts**: 套餐钩子，提供组件级套餐数据访问和操作功能。
 
 ## 功能模块
 
