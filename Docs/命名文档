@@ -1,0 +1,653 @@
+# AI服务标准命名
+
+## AI请求方法
+| 方法名称 | 描述 |
+|---------|------|
+| generateStoryStart | 生成游戏故事的开始部分 |
+| generateStoryContinuation | 基于玩家选择续写故事内容 |
+| generateBattleScene | 生成战斗场景描述和选项 |
+
+## 响应处理方法
+| 方法名称 | 描述 |
+|---------|------|
+| handleStartResponse | 处理故事开始响应 |
+| handleContinueResponse | 处理故事续写响应 |
+| handleBattleResponse | 处理战斗场景响应 |
+
+## 事件命名空间
+| 命名空间 | 用途 | 示例 |
+|---------|------|------|
+| ai.* | AI服务相关事件 | ai.request.start, ai.request.success |
+| story.* | 故事相关事件 | story.generated, story.continued |
+| battle.* | 战斗相关事件 | battle.started, battle.turn_completed |
+| auth.* | 认证相关事件 | auth.user.login, auth.session.expired |
+| background.effects.* | 背景特效相关事件 | background.effects.initialized, background.effects.created |
+| cache.* | 缓存相关事件 | cache.initialized, cache.item.added |
+
+## 错误类型
+| 错误代码 | 描述 | 需记录信息 |
+|---------|------|----------|
+| TIMEOUT | 请求超时错误 | 请求ID、超时时间、重试次数 |
+| NETWORK_ERROR | 网络连接错误 | 错误代码、请求URL、错误详情 |
+| SERVICE_ERROR | AI服务异常错误 | 服务响应代码、错误消息、请求参数 |
+
+# 认证服务标准命名
+
+## 账户类型
+| 类型名称 | 描述 |
+|---------|------|
+| AccountType.EMAIL | 邮箱注册的账户 |
+| AccountType.GOOGLE | Google登录的账户 |
+| AccountType.ANONYMOUS | 匿名登录的账户 |
+
+## 认证方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| registerWithEmail | 使用邮箱注册新用户 | email, password |
+| loginWithEmail | 使用邮箱登录 | email, password |
+| loginWithGoogle | 使用Google账号登录 | - |
+| loginAnonymously | 创建匿名账号并登录 | - |
+| upgradeAnonymous | 将匿名账号升级为正式账号 | email, password |
+| logout | 用户登出并清理缓存 | - |
+| refreshSession | 刷新当前会话令牌 | options?: {maxRetries} |
+| getCurrentUser | 获取当前登录用户信息 | - |
+| isAuthenticated | 检查用户是否已认证 | - |
+| isAnonymous | 检查当前用户是否为匿名用户 | - |
+
+## 认证事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| auth.user.created | 用户创建完成 | userId, userData, timestamp |
+| auth.user.login | 用户登录成功 | userId, userData, timestamp |
+| auth.user.logout | 用户登出完成 | userId, timestamp |
+| auth.session.refresh | 会话刷新完成 | userId, timestamp |
+| auth.session.expired | 会话过期 | userId, timestamp |
+| auth.anonymous.login | 匿名登录成功 | userId, timestamp |
+| auth.anonymous.upgrade | 匿名账号升级 | userId, newEmail, timestamp |
+| auth.anonymous.upgrade.start | 开始匿名账号升级 | userId, timestamp |
+| auth.anonymous.upgrade.success | 匿名账号升级成功 | userId, newEmail, timestamp |
+| auth.anonymous.upgrade.failed | 匿名账号升级失败 | userId, error, timestamp |
+| auth.anonymous.upgrade.conflict | 匿名账号升级冲突 | userId, conflictEmail, timestamp |
+| auth.form.change | 认证表单类型切换 | formType, timestamp |
+
+# 认证UI标准命名
+
+## 认证UI组件
+| 组件名称 | 描述 | 子组件 |
+|---------|------|--------|
+| AuthModal | 认证模态框主组件 | LoginForm, RegisterForm, ForgotPasswordForm, AnonymousUpgradeForm |
+| LoginForm | 登录表单组件 | EmailLogin, GoogleLogin |
+| RegisterForm | 注册表单组件 | EmailRegister, GoogleRegister |
+| ForgotPasswordForm | 忘记密码表单 | PasswordReset |
+| AnonymousUpgradeForm | 匿名账号升级表单 | EmailUpgrade, GoogleUpgrade |
+
+## 表单类型常量
+| 常量名称 | 描述 | 使用场景 |
+|---------|------|---------|
+| LOGIN_FORM | 登录表单类型 | 登录表单切换 |
+| REGISTER_FORM | 注册表单类型 | 注册表单切换 |
+| FORGOT_PASSWORD_FORM | 忘记密码表单类型 | 忘记密码表单切换 |
+| ANONYMOUS_UPGRADE_FORM | 匿名升级表单类型 | 匿名升级表单切换 |
+
+## 表单状态常量
+| 常量名称 | 描述 | 使用场景 |
+|---------|------|---------|
+| IDLE | 初始/空闲状态 | 表单初始化或重置时 |
+| LOADING | 加载中状态 | 网络请求或异步操作进行中 |
+| ERROR | 错误状态 | 表单验证失败或请求错误 |
+| SUCCESS | 成功状态 | 操作完成成功 |
+
+## 匿名升级方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| upgradeWithEmail | 使用邮箱升级匿名账号 | email, password |
+| upgradeWithGoogle | 使用Google账号升级匿名账号 | - |
+| startUpgrade | 启动匿名账号升级流程 | - |
+
+# 背景特效标准命名
+
+## 背景特效命名规则
+| 规则类型 | 规则描述 | 示例 |
+|---------|---------|------|
+| 模块与管理器类 | 使用background-effects-*前缀(复数形式) | background-effects-module, background-effects-manager |
+| 具体特效实例 | 使用background-effect-*前缀(单数形式) | background-effect-particles, background-effect-waves |
+
+## 背景特效事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| background.effects.initialized | 模块初始化完成 | timestamp |
+| background.effects.created | 特效创建完成 | effectId, effectType, canvas, timestamp, dimensions |
+| background.effects.removed | 特效移除完成 | effectId, timestamp |
+| background.effects.resized | 窗口大小变化调整完成 | dimensions, timestamp |
+| background.effects.error | 特效运行异常 | effectId, errorMsg, timestamp |
+
+## 背景特效管理器方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| BackgroundEffectsModule.init | 初始化背景特效模块 | 无参数/返回void |
+| BackgroundEffectsModule.create | 创建特效实例 | (id:string, canvas:HTMLCanvasElement, type:string)/返回BackgroundEffect实例 |
+| BackgroundEffectsModule.get | 获取特效实例 | (id:string)/返回BackgroundEffect实例或null |
+| BackgroundEffectsModule.remove | 移除特效实例 | (id:string)/返回boolean |
+| BackgroundEffectsModule.handleResize | 处理窗口大小变化 | 无参数/返回void |
+
+## 背景特效实例方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| BackgroundEffect.render | 渲染特效 | (timestamp:number)/返回void |
+| BackgroundEffect.destroy | 销毁特效实例 | 无参数/返回void |
+| BackgroundEffect.resize | 调整特效尺寸 | (width:number, height:number)/返回void |
+
+# 缓存管理标准命名
+
+## 缓存类及模块
+| 类/模块名称 | 描述 | 主要职责 |
+|------------|------|---------|
+| CacheManager | 缓存管理器 | 全局缓存统一管理、分层、加密、签名、过期、清理、降级、分片、初始化 |
+| CacheConfig | 缓存配置 | 配置、过期时间、类型映射、降级策略、版本控制 |
+| CacheHelper | 缓存辅助工具 | 异步安全调用、缓存就绪检测、多端同步、错误处理 |
+| CacheInit | 缓存初始化 | 缓存系统初始化、依赖管理、模块注册 |
+| CommonDataCache | 通用数据缓存 | 通用数据缓存、结构校验、同步、刷新、主动失效、签名验证 |
+| UserDataCache | 用户数据缓存 | 用户数据缓存、VIP状态、购买记录、分片、清理、安全存储 |
+
+## 缓存事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| cache.initialized | 缓存系统初始化完成 | timestamp |
+| cache.item.added | 缓存项添加 | key, value, timestamp |
+| cache.item.updated | 缓存项更新 | key, oldValue, newValue, timestamp |
+| cache.item.removed | 缓存项移除 | key, timestamp |
+| cache.cleared | 缓存清理完成 | type, timestamp |
+| cache.error | 缓存操作错误 | key, errorMsg, timestamp |
+
+## 缓存键命名规则
+| 数据类型 | 键名格式 | 示例 |
+|---------|---------|------|
+| 用户基本信息 | user_data_{userId} | user_data_123456 |
+| VIP状态信息 | user_vip_{userId} | user_vip_123456 |
+| 购买记录信息 | purchase_history_{userId} | purchase_history_123456 |
+| 通用配置数据 | config_{configType} | config_game_settings |
+| 世界框架数据 | framework_{frameworkType} | framework_world_1 |
+| 价格数据 | price_{region}_{currency} | price_us_usd |
+
+## 缓存管理器方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| CacheManager.setCache | 设置缓存 | (key:string, value:T, options:object)/返回void |
+| CacheManager.getCache | 获取缓存 | (key:string, options:object)/返回T或null |
+| CacheManager.removeCache | 移除缓存 | (key:string)/返回void |
+| CacheManager.clearCacheByType | 按类型清理缓存 | (type:string)/返回void |
+| CacheHelper.safeGetCache | 安全异步获取缓存 | (key:string)/返回Promise<T或null> |
+| CacheHelper.isCacheReady | 检查缓存是否就绪 | 无参数/返回boolean |
+| CacheInit.reloadCacheSystem | 重新加载缓存系统 | 无参数/返回Promise<void> |
+
+# 事件总线标准命名
+
+## 事件总线核心规范
+| 规范类型 | 规则描述 | 示例/备注 |
+|---------|---------|------------|
+| 事件命名格式 | 必须使用命名空间格式：`{模块}.{子模块}.{动作}` | auth.session.created, ui.modal.shown |
+| 事件数据结构 | 必须是可序列化对象，包含timestamp字段 | { timestamp: Date.now(), userId: "123", ... } |
+| 单例实现 | EventBus类必须实现为单例，通过getInstance()获取 | const eventBus = EventBus.getInstance(); |
+
+## 事件优先级枚举
+| 优先级名称 | 数值 | 说明 |
+|-----------|------|------|
+| EventPriority.CRITICAL | 1000 | 最高优先级，系统核心监听器 |
+| EventPriority.HIGH | 100 | 高优先级，业务核心监听器 |
+| EventPriority.NORMAL | 0 | 默认优先级 |
+| EventPriority.LOW | -100 | 低优先级，非关键监听器 |
+| EventPriority.IDLE | -1000 | 最低优先级，日志、分析等 |
+
+## 事件总线核心方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| on | 注册事件监听 | (eventName: string, callback: Function, options?: {priority, groupId})/返回void |
+| once | 注册一次性事件监听 | (eventName: string, callback: Function, options?: {priority, groupId})/返回void |
+| off | 注销特定事件监听 | (eventName: string, callback: Function)/返回void |
+| offAll | 注销所有特定事件监听 | (eventName: string)/返回void |
+| offGroup | 注销特定分组的所有监听器 | (groupId: string)/返回void |
+| emit | 同步触发事件 | (eventName: string, data?: object)/返回void |
+| emitAsync | 异步触发事件 | (eventName: string, data?: object)/返回Promise<void> |
+| debounce | 注册防抖动事件监听 | (eventName: string, callback: Function, wait?: number, options?: object)/返回void |
+| throttle | 注册节流事件监听 | (eventName: string, callback: Function, limit?: number, options?: object)/返回void |
+
+## React Hook封装方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| useEventBus | React Hook封装事件总线 | 无参数/返回{on, once, emit, emitAsync, bus} |
+
+## 事件分组命名规则
+| 应用场景 | 格式 | 示例 |
+|---------|------|------|
+| 组件事件分组 | component-{timestamp}-{randomId} | component-1625142548213-a1b2c3 |
+| 模块事件分组 | {moduleName}-{featureName} | auth-session, shop-purchase |
+| 全局事件分组 | global-{featureName} | global-notification, global-error |
+
+## 常用事件模块前缀
+| 前缀 | 用途 | 示例事件 |
+|------|------|----------|
+| auth | 认证相关事件 | auth.login.completed, auth.session.expired |
+| ui | 界面相关事件 | ui.modal.shown, ui.page.changed |
+| data | 数据相关事件 | data.frameworks.loaded, data.user.updated |
+| system | 系统相关事件 | system.initialized, system.error |
+| purchase | 购买相关事件 | purchase.order.created, purchase.payment.completed |
+| game | 游戏相关事件 | game.started, game.paused, game.ended |
+
+# 错误处理标准命名
+
+## 错误类型枚举
+| 枚举值 | 说明 | 使用场景 |
+|-------|------|---------|
+| ErrorType.NETWORK | 网络错误 | 网络请求失败、连接超时等 |
+| ErrorType.API | API错误 | 服务端返回非200状态码、响应格式错误等 |
+| ErrorType.AUTH | 认证错误 | 会话过期、权限不足等 |
+| ErrorType.DATA | 数据错误 | 数据格式错误、数据校验失败等 |
+| ErrorType.UI | UI错误 | 组件渲染错误、UI状态冲突等 |
+| ErrorType.UNKNOWN | 未知错误 | 其他未分类错误 |
+
+## 错误严重程度枚举
+| 枚举值 | 说明 | 使用场景 |
+|-------|------|---------|
+| ErrorSeverity.CRITICAL | 严重错误 | 应用无法继续、需要立即处理的错误 |
+| ErrorSeverity.WARNING | 警告错误 | 功能受限、但应用可继续使用的错误 |
+| ErrorSeverity.INFO | 信息错误 | 提示性错误、对功能影响轻微的错误 |
+
+## 错误上下文结构
+| 字段名 | 类型 | 说明 | 必填 |
+|-------|------|------|------|
+| userId | string | 用户ID | 否 |
+| path | string | 错误发生的路径 | 是 |
+| action | string | 错误发生的操作 | 否 |
+| timestamp | number | 错误发生的时间戳 | 是 |
+| metadata | object | 其他元数据 | 否 |
+
+## 错误事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| error.network.occurred | 网络错误发生 | error, timestamp |
+| error.api.occurred | API错误发生 | error, timestamp |
+| error.auth.occurred | 认证错误发生 | error, timestamp |
+| error.data.occurred | 数据错误发生 | error, timestamp |
+| error.ui.occurred | UI错误发生 | error, timestamp |
+| error.unknown.occurred | 未知错误发生 | error, timestamp |
+
+## 错误提示方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| showErrorToast | 显示错误提示条 | error: AppError |
+| showErrorModal | 显示错误对话框 | error: AppError |
+| showErrorInline | 在组件内显示错误 | error: AppError, container: HTMLElement |
+
+## 错误UI事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| ui.toast.show | 显示Toast提示 | message, type, duration |
+| ui.modal.show | 显示Modal对话框 | title, content, type, actions |
+| ui.inline.error | 显示内联错误 | message, containerId |
+
+# Firebase服务标准命名
+
+## Firebase服务类
+| 类名 | 描述 | 主要职责 |
+|------|------|---------|
+| FirebaseService | Firebase核心服务 | 初始化、实例管理、所有Firebase服务的统一入口 |
+| FirebaseAuthService | Firebase认证服务 | 用户认证、会话管理、令牌刷新 |
+| FirebaseConfig | Firebase配置管理 | 环境变量封装、配置加载 |
+| FirebaseStorage | Firebase存储服务 | 文件上传下载、媒体资源管理 |
+| FirebaseFirestore | Firebase数据库服务 | 文档存取、查询、事务处理 |
+| FirebaseRealtime | 实时数据库服务 | 实时数据同步、在线状态管理 |
+
+## Firebase数据方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| getUserData | 获取用户数据 | userId: string, options?: {forceRefresh: boolean} |
+| saveUserData | 保存用户数据 | userId: string, userData: any |
+| getGameData | 获取游戏存档数据 | userId: string, saveId: string, options?: {forceRefresh: boolean} |
+| saveGameData | 保存游戏存档数据 | userId: string, saveId: string, gameData: any |
+| getCachedUserData | 从缓存获取用户数据 | userId: string |
+| cacheUserData | 缓存用户数据 | userId: string, userData: any |
+| handleFirebaseNetworkError | 处理Firebase网络错误 | error: any, retryCallback: () => Promise<any> |
+
+## Firebase事件
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| auth.state.changed | 认证状态变化 | user, timestamp |
+| user.data.updated | 用户数据更新 | userId, timestamp |
+| game.save.updated | 游戏存档更新 | userId, saveId, timestamp |
+| firebase.network.error | Firebase网络错误 | error, path, timestamp |
+| firebase.config.loaded | Firebase配置加载完成 | timestamp |
+
+## Firebase数据结构
+| 字段名 | 类型 | 说明 | 使用场景 |
+|-------|------|------|----------|
+| lastUpdated | number | 数据最后更新时间戳 | 所有Firebase存储的数据 |
+| signature | string | 数据签名，用于验证完整性 | 敏感数据和用户生成内容 |
+| expiresAt | number | 数据过期时间戳 | 临时数据和缓存数据 |
+| userId | string | 数据所属用户ID | 用户相关数据 |
+| metadata | object | 数据元信息 | 各类数据的附加信息 |
+
+## Firebase数据读取器
+| 类名 | 描述 | 主要职责 |
+|------|------|---------|
+| FirebaseDataReader | Firebase数据读取核心服务 | 统一数据读取入口、缓存优先策略、错误处理与重试 |
+| WorldDataReader | 世界框架数据读取器 | 读取框架数据、筛选、分组、权限过滤 |
+| UserDataReader | 用户数据读取器 | 读取用户配置、偏好、状态等数据 |
+| SaveDataReader | 存档数据读取器 | 读取游戏存档、版本管理、导入导出 |
+
+## 数据读取结果结构
+| 接口/字段 | 类型 | 说明 | 必填 |
+|----------|------|------|------|
+| DataResult<T> | 泛型接口 | 数据读取结果封装 | - |
+| data | T \| null | 实际读取的数据 | 是 |
+| metadata | object | 数据元信息 | 是 |
+| metadata.lastUpdated | number | 数据最后更新时间戳 | 是 |
+| metadata.source | 'cache' \| 'server' | 数据来源 | 是 |
+| metadata.version | string | 数据版本 | 是 |
+| status | 'success' \| 'error' \| 'loading' | 数据状态 | 是 |
+| error | Error \| undefined | 错误信息 | 否 |
+
+## 数据读取选项
+| 参数名 | 类型 | 说明 | 默认值 |
+|-------|------|------|--------|
+| forceRefresh | boolean | 是否强制从服务器刷新 | false |
+| timeout | number | 请求超时时间(毫秒) | 30000 |
+| retryCount | number | 重试次数 | 3 |
+| cacheTime | number | 缓存有效时间(毫秒) | 300000 |
+
+# 首页标准命名
+
+## 首页UI组件命名
+| 组件名称 | 描述 | 子组件 |
+|---------|------|--------|
+| HomePage | 首页主组件 | LoadingScreen, ErrorScreen, UserInfo, ActionButton |
+| home-container | 首页容器样式类 | home-header, home-main, home-actions, home-footer |
+| home-header | 头部区域样式类 | home-title, UserInfo, SettingsButton |
+| home-main | 主内容区样式类 | MysteriousVoice, PlayerSelection |
+| home-actions | 操作区样式类 | ActionButton |
+| home-footer | 底部区域样式类 | home-copyright, SocialLinks |
+
+## 首页事件命名
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| home.initialization.started | 首页初始化开始 | timestamp |
+| home.initialization.completed | 首页初始化完成 | timestamp |
+| home.destroyed | 首页组件销毁 | timestamp |
+| home.ui.update | 首页UI状态更新 | stateChanges, timestamp |
+| home.game.start | 游戏开始 | timestamp |
+| home.shop.open | 打开商店 | timestamp |
+| home.settings.open | 打开设置 | timestamp |
+| home.assets.loaded | 资产加载完成 | timestamp |
+
+## 首页钩子与方法
+| 方法名称 | 描述 | 参数/返回值 |
+|---------|------|------------|
+| useAuth | 认证相关钩子 | 返回{user, loading, error} |
+| useEventBus | 事件总线钩子 | 返回{emit, on, off} |
+| useModal | 模态框钩子 | 返回{showModal} |
+| useUserAssets | 用户资产钩子 | 返回{assets, loadAssets} |
+| handleAuthChange | 处理认证变化 | (data) => void |
+| handleUiStateUpdate | 处理UI状态更新 | (data) => void |
+| handleAssetsUpdate | 处理资产更新 | (data) => void |
+| handleError | 处理错误 | (error) => void |
+| handleLogout | 处理登出 | () => Promise<void> |
+| handleStartGame | 处理开始游戏 | () => void |
+| handleOpenShop | 处理打开商店 | () => void |
+
+## 首页Context与状态管理
+| Context名称 | 描述 | 主要状态 |
+|------------|------|---------|
+| HomeContext | 首页全局状态上下文 | uiState, loadingState, assetsState |
+| HomeUIState | 首页UI状态类型 | isAuthenticated, userName, mysteriousText, availableCharacters, canStartGame, socialLinks |
+| HomeLoadingState | 首页加载状态类型 | isLoading, loadingMessage, progress |
+| HomeAssetsState | 首页资产状态类型 | isLoaded, assets, lastUpdated |
+
+# 主页UI标准命名
+
+## 主页CSS类命名
+| 类名 | 描述 | 用途 |
+|-----|------|------|
+| home-container | 主页容器类 | 最外层容器，包含所有主页内容 |
+| home-header | 头部区域类 | 包含标题、用户信息、设置按钮 |
+| home-content | 主内容区类 | 包含神秘声音、玩家选择界面 |
+| home-main | 主区域类 | 主内容区的另一种命名 |
+| home-actions | 操作区类 | 包含游戏开始、商店等操作按钮 |
+| home-footer | 底部区域类 | 包含版权信息、社交链接 |
+| home-title | 标题类 | 主页标题文本 |
+| home-subtitle | 副标题类 | 主页副标题文本 |
+| home-entry-* | 功能入口类前缀 | 各种功能入口卡片 |
+| home-action-* | 操作按钮类前缀 | 各种操作按钮 |
+
+## 主页组件命名
+| 组件名 | 描述 | 子组件 |
+|-------|------|--------|
+| HomePage | 主页组件 | HomeHeader, MysteriousVoice, PlayerChoices, ActionButtons, HomeFooter |
+| HomeHeader | 头部组件 | 标题、副标题、用户信息 |
+| MysteriousVoice | 神秘声音组件 | 文本显示、音效 |
+| PlayerChoices | 玩家选择组件 | 选择选项、选择结果 |
+| ActionButtons | 操作按钮组件 | 继续按钮、更多信息按钮 |
+| HomeFooter | 底部组件 | 版权信息、社交链接 |
+| LoadingOverlay | 加载覆盖组件 | 加载动画、加载提示 |
+| ErrorScreen | 错误屏幕组件 | 错误提示、重试按钮 |
+
+## 主页UI事件命名
+| 事件名 | 描述 | 包含数据 |
+|-------|------|---------|
+| home.entry.clicked | 入口卡片点击 | entry: string, timestamp: number |
+| home.action.clicked | 操作按钮点击 | button: string, timestamp: number |
+| home.initialization.completed | 页面加载完成 | timestamp: number |
+| home.user.updated | 用户信息更新 | user: object, timestamp: number |
+| home.choice.selected | 选择选项完成 | choice: string/object, timestamp: number |
+
+## 主页UI样式变量
+| 变量名 | 描述 | 值 |
+|-------|------|---|
+| --bg-darkest | 最深背景色 | #0a0a14 |
+| --accent-color | 主强调色 | #d4af37 |
+| --accent-dark | 深强调色 | #b38d1d |
+| --text-primary | 主文本色 | #e0e0e0 |
+| --text-secondary | 次要文本色 | #9e9e9e |
+| --border-primary | 主边框色 | rgba(255, 255, 255, 0.1) |
+| --glow-primary | 主发光色 | rgba(212, 175, 55, 0.5) |
+
+## 主页UI动画命名
+| 动画名 | 描述 | 用途 |
+|-------|------|-----|
+| titleGlow | 标题发光动画 | 用于标题的发光效果 |
+| fadeIn | 淡入动画 | 用于元素的入场效果 |
+| runeRotate | 符文旋转动画 | 用于背景图案的旋转效果 |
+
+# 全局状态管理标准命名
+
+## 核心类与组件
+| 类/组件名称 | 描述 | 主要职责 |
+|------------|------|---------|
+| GlobalStateManager | 全局状态管理器 | 状态初始化、更新、订阅、时间旅行、持久化 |
+| StateContext | React状态上下文 | 为React组件提供状态访问 |
+| StateProvider | 状态提供者组件 | 提供全局状态上下文 |
+| StateDebugger | 状态调试器组件 | 历史记录查看、时间旅行功能 |
+
+## 状态分类
+| 状态域 | 描述 | 示例键名 |
+|--------|------|----------|
+| app | 应用状态 | version, theme, language, isOnline |
+| user | 用户状态 | isAuthenticated, userId, profile, preferences |
+| business | 业务状态 | frameworks, archives, purchases, unlocked |
+| ui | UI状态 | currentView, modals, loading, notifications |
+| session | 会话状态 | formData, tempData, navigation, sessionId |
+
+## 状态管理Hooks
+| Hook名称 | 描述 | 返回值 |
+|----------|------|--------|
+| useState | 获取全局状态 | 整个状态树或特定域状态 |
+| useDispatch | 获取派发函数 | dispatch函数 |
+| useSelector | 使用选择器获取状态 | 选择器返回的状态切片 |
+| useUserState | 用户状态管理 | user状态与相关操作方法 |
+| useUIState | UI状态管理 | ui状态与相关操作方法 |
+
+## Action命名规范
+| 命名格式 | 描述 | 示例 |
+|----------|------|------|
+| {domain}/{verb} | 简单动作 | user/login, ui/reset |
+| {domain}/{noun}/{verb} | 复杂动作 | ui/modal/show, business/framework/unlock |
+| {动作}_完成状态 | 已完成动作 | user/logged_in, data/loaded |
+| {动作}_进行状态 | 进行中动作 | auth/logging_in, data/loading |
+| {动作}_请求状态 | 请求状态 | user/fetch_profile/request, user/fetch_profile/success |
+
+> **注意**: 状态管理中的Action命名使用斜杠("/")分隔格式，而事件总线中的事件命名使用点(".")分隔格式。这是两个不同系统的约定，Action用于状态内部更新，而Event用于跨模块通信。在编写代码时请注意区分这两种不同的命名约定。
+
+## 状态键命名规范
+| 规则 | 描述 | 示例 |
+|------|------|------|
+| 驼峰式命名法 | 所有状态键使用驼峰命名 | userProfile, isLoading, modalVisible |
+| 布尔值前缀 | 布尔值使用is/has/should前缀 | isAuthenticated, hasPermission, shouldRefresh |
+| 列表使用复数 | 集合类数据使用复数形式 | users, notifications, frameworks |
+| 时间戳后缀 | 时间戳使用At后缀 | createdAt, updatedAt, lastLoginAt |
+| 避免数字索引 | 不直接使用数字作为键名 | items[0]改为firstItem |
+
+## 时间旅行方法
+| 方法名称 | 描述 | 参数 |
+|----------|------|------|
+| timeTravel | 跳转到特定历史状态 | index: 历史索引 |
+| forward | 前进一步 | 无 |
+| backward | 后退一步 | 无 |
+| recordHistory | 记录状态历史 | action: 触发的动作 |
+
+# 大厅UI标准命名
+
+## CSS类命名规范
+| 规则类型 | 命名规则 | 示例 |
+|---------|---------|------|
+| 主容器类 | lobby-container | .lobby-container |
+| 主要区域类 | lobby-{区域名} | .lobby-header, .lobby-sidebar, .lobby-main |
+| 功能区域类 | lobby-{功能}-{子类型} | .lobby-world-card, .lobby-assets-display |
+| 交互元素类 | lobby-{元素}-{状态} | .lobby-button-primary, .lobby-nav-selected |
+| 动画类 | lobby-{元素}-{动画类型} | .lobby-card-fadeIn, .lobby-button-pulse |
+| 响应式类 | lobby-{元素}-{设备类型} | .lobby-sidebar-mobile, .lobby-nav-tablet |
+
+## 事件命名规范
+| 事件类型 | 命名格式 | 示例 |
+|---------|---------|------|
+| 页面生命周期 | lobby.{动作} | lobby.loaded, lobby.unloaded |
+| 用户交互 | lobby.{对象}.{动作} | lobby.button.clicked, lobby.nav.changed |
+| 数据变更 | lobby.{数据类型}.{动作} | lobby.assets.updated, lobby.worlds.loaded |
+| 状态变化 | lobby.{组件}.{状态} | lobby.world.selected, lobby.modal.shown |
+| 异步操作 | lobby.{操作}.{状态} | lobby.data.loading, lobby.data.success |
+
+## UI组件命名
+| 组件类型 | 命名规则 | 示例 |
+|---------|---------|------|
+| 容器组件 | Lobby{区域}Container | LobbyMainContainer, LobbySidebarContainer |
+| 功能组件 | Lobby{功能}Component | LobbyWorldSelector, LobbyAssetsDisplay |
+| 卡片组件 | Lobby{类型}Card | LobbyWorldCard, LobbyUserCard |
+| 导航组件 | Lobby{类型}Nav | LobbyMainNav, LobbySubNav |
+| 按钮组件 | Lobby{类型}Button | LobbyActionButton, LobbyNavButton |
+| 模态组件 | Lobby{类型}Modal | LobbySettingsModal, LobbyConfirmModal |
+
+## 文件命名规范
+| 文件类型 | 命名规则 | 示例 |
+|---------|---------|------|
+| 主样式文件 | lobby.scss | lobby.scss |
+| 区域样式文件 | lobby-{区域}.scss | lobby-sidebar.scss, lobby-main.scss |
+| 组件样式文件 | _lobby-{组件}.scss | _lobby-nav.scss, _lobby-cards.scss |
+| 主组件文件 | LobbyContainer.tsx | LobbyContainer.tsx |
+| 子组件文件 | Lobby{功能}.tsx | LobbyWorldSelector.tsx, LobbyNavigation.tsx |
+| 工具文件 | lobby-{功能}-utils.ts | lobby-animation-utils.ts, lobby-data-utils.ts |
+
+# 大厅主流程标准命名
+
+## 初始化方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| startLobbyInit | 统一入口初始化函数 | 无/返回Promise<void> |
+| waitForAuthReady | 等待认证就绪 | 无/返回Promise<void> |
+| waitForWorldFrameworks | 等待世界框架就绪 | 无/返回Promise<void> |
+| useLobbyManager | React Hook封装大厅管理器 | 无/返回LobbyManager实例 |
+
+## 管理器类与接口
+| 类/接口名称 | 描述 | 主要职责 |
+|------------|------|---------|
+| LobbyManager | 大厅管理器接口 | 定义大厅核心操作和事件 |
+| LobbyManagerImpl | 大厅管理器实现类 | 实现大厅所有核心功能 |
+
+## 事件标准
+| 事件名称 | 描述 | 包含数据 |
+|---------|------|----------|
+| lobby.loaded | 大厅加载完成 | timestamp |
+| lobby.unloaded | 大厅卸载完成 | timestamp |
+| lobby.panel.shown | 面板显示 | panelId, timestamp |
+| lobby.panel.hidden | 面板隐藏 | panelId, timestamp |
+| world.frameworks.ready | 世界框架加载完成 | timestamp |
+| assets.updated | 资产更新 | assets对象 (coins, diamonds等) |
+| auth.user.logout | 用户登出 | userId, timestamp |
+| error.system.occurred | 系统错误发生 | error对象, timestamp |
+
+## 同步消息类型
+| 类型值 | 描述 | 使用场景 |
+|-------|------|---------|
+| assets | 资产同步 | 金币、钻石等资产变更时 |
+| purchase | 购买同步 | 购买操作完成时 |
+| vip | VIP状态同步 | VIP状态变更时 |
+| userData | 用户数据同步 | 用户设置、偏好等变更时 |
+| syncRequest | 通用同步请求 | 请求数据同步时 |
+
+## 面板方法
+| 方法名称 | 描述 | 参数 |
+|---------|------|------|
+| showPanel | 显示面板 | panelId: string |
+| hidePanel | 隐藏面板 | panelId: string |
+| hideAllPanels | 隐藏所有面板 | 无 |
+| registerPanel | 注册面板 | panelId: string, component: React.Component |
+| unregisterPanel | 注销面板 | panelId: string |
+
+## 数据接口
+| 接口名称 | 描述 | 主要字段 |
+|---------|------|---------|
+| Assets | 用户资产 | coins: number, diamonds: number, frameworks?: string[] |
+| SessionCheckOptions | 会话检测选项 | maxRetries?: number, retryInterval?: number, silent?: boolean |
+| SyncMessage | 同步消息 | type: string, data: unknown, timestamp: number, userId: string, operationId?: string, checksum?: string |
+
+# 模块依赖管理标准命名
+
+## 模块命名规范
+| 规则 | 说明 | 示例 |
+| --- | --- | --- |
+| 使用PascalCase | 模块名称必须使用大驼峰（PascalCase）命名 | AuthService, CacheManager |
+| 使用一致前缀 | 相关模块使用一致的前缀 | Cache开头的缓存相关模块, Auth开头的认证相关模块 |
+| 避免通用名称 | 避免使用过于通用的名称，防止冲突 | 使用UserService而非User或Service |
+| 明确表达功能 | 名称应明确表达模块功能 | ConfigManager而非Configuration |
+
+## 模块依赖管理方法
+| 方法名 | 说明 | 参数/返回值 |
+| --- | --- | --- |
+| ModuleDependency.registerModule | 注册模块 | 参数: name(string), module(any), options?({version, dependencies, override}) <br> 返回: void |
+| ModuleDependency.getModule | 获取已注册模块 | 参数: name(string) <br> 返回: T \| null |
+| ModuleDependency.waitForModule | 等待模块加载完成 | 参数: name(string), callback?(module=>void), options?({timeout,onTimeout}) <br> 返回: Promise<T> |
+| ModuleDependency.waitForModules | 等待多个模块加载完成 | 参数: names(string[]), callback?(modules=>void), options?({timeout,onTimeout}) <br> 返回: Promise<any[]> |
+| ModuleDependency.pollForModule | 轮询等待模块加载 | 参数: name(string), options?({interval,maxAttempts,timeout}) <br> 返回: Promise<T> |
+
+## 模块依赖管理事件
+| 事件名 | 说明 | 事件数据 |
+| --- | --- | --- |
+| module.registered | 模块注册完成 | { moduleName, version, timestamp } |
+| module.loaded | 模块加载完成 | { moduleName, version, timestamp } |
+| module.failed | 模块加载失败 | { moduleName, error, timestamp } |
+| module.timeout | 模块加载超时 | { moduleName, timeout, timestamp } |
+| module.recovered | 模块恢复成功 | { moduleName, attempts, timestamp } |
+
+## 模块状态枚举
+| 状态名称 | 说明 | 使用场景 |
+| --- | --- | --- |
+| ModuleStatus.REGISTERED | 已注册未加载 | 模块刚刚注册但未初始化 |
+| ModuleStatus.LOADING | 加载中 | 模块正在加载或初始化 |
+| ModuleStatus.LOADED | 加载完成 | 模块加载并初始化完成 |
+| ModuleStatus.FAILED | 加载失败 | 模块加载或初始化失败 |
+| ModuleStatus.UNREGISTERED | 未注册 | 模块未注册或已移除 |
+
+## 模块错误类型
+| 错误类型 | 说明 | 使用场景 |
+| --- | --- | --- |
+| ModuleError.NOT_FOUND | 模块未找到 | 请求不存在的模块 |
+| ModuleError.TIMEOUT | 加载超时 | 模块加载超过指定时间 |
+| ModuleError.DEPENDENCY_MISSING | 依赖缺失 | 缺少必需的依赖模块 |
+| ModuleError.VERSION_CONFLICT | 版本冲突 | 依赖版本不兼容 |
+| ModuleError.INIT_FAILED | 初始化失败 | 模块初始化过程出错 |
