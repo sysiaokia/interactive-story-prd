@@ -8,18 +8,24 @@
 
 ### 2.1 大厅主页
 
-- 提供世界框架展示区、存档管理区、资产栏、快捷入口、操作按钮区四大核心区域
-- **默认展示"世界框架"(world类别)** 作为首个展示的框架类型
+- 大厅默认显示主导航按钮区，包含以下核心功能按钮：
+  - **开始游戏**：点击后打开世界选择界面
+  - **存档管理**：点击后显示存档管理界面
+  - **冒险记录**：点击后显示冒险记录界面
+  - **商店**：点击后进入商店模块
+  - **个人档案**：点击后显示用户个人资料
+  - **设置**：点击后显示设置界面
+- 顶部显示用户资产信息（金币、钻石）和VIP状态
+- 所有按钮采用卡片式大按钮设计，支持图标和文字说明
 - 支持根据用户状态（游客/登录/VIP）显示不同内容
-- 实现顶部导航栏，包含分类切换功能
-- 右侧/顶部显示用户资产（金币、钻石）信息
 - 使用React Context提供全局状态管理
+- 按钮区域采用网格布局，在不同设备上自适应排列
 
 ### 2.2 世界选择（开始游戏）
 
-- 点击"开始游戏"或"世界选择"按钮，打开世界框架选择界面
-- 世界框架以卡片形式展示，支持分类
-- 框架卡片包含名称、描述和解锁状态
+- **重要**：世界选择界面**不默认展示**，仅在用户点击"开始游戏"按钮后才打开
+- 世界框架以卡片形式展示，支持分类，打开后**默认展示"世界框架"(world类别)** 作为首个展示的框架类型
+- 框架卡片包含名称和解锁状态
 - 已解锁框架点击后展示操作选项：
   - 创建新存档
   - 载入现有存档（如有）
@@ -27,6 +33,7 @@
 - 世界选择流程完全遵循world-selection.mdc规则
 - 选择完成后，根据用户选择进入游戏或创建新存档
 - 使用TypeScript接口定义所有数据结构，保证类型安全
+- 提供返回按钮，允许用户退回到大厅
 
 ### 2.3 存档管理
 
@@ -144,13 +151,17 @@
 - 响应式设计，使用SCSS预处理器结合Grid和Flexbox，遵循BEM命名规范，适配各种屏幕尺寸
 - 主体内容区域居中，最大宽度限制
 - 分层结构：背景层、装饰层、主内容区、通知区
+- 主导航按钮区采用网格布局：
+  - 桌面版：3x3或4x2网格布局
+  - 平板版：2x4网格布局
+  - 移动版：2x4或1x8垂直布局
 - 所有UI元素必须位于页面可视区域内，避免超出屏幕
 - 采用SCSS模块化组织，确保组件样式隔离，避免全局污染
 
 ### 3.2 框架卡片组件
 
 - 使用React函数组件实现卡片设计(`<FrameworkCard>`)
-- 卡片包含标题、描述、状态标记
+- 卡片包含标题、状态标记
 - 卡片悬停效果和点击动画
 - 不同状态（已解锁、未解锁、VIP专属）的视觉区分
 - 支持批量渲染和虚拟列表技术(react-virtualized)
@@ -303,24 +314,23 @@ const Lobby: React.FC = () => {
   // 认证状态
   const { user, loading: authLoading } = useAuth();
   
-  // 框架数据
-  const { frameworks, loading: frameworksLoading, error: frameworksError } = useFrameworks();
-  
-  // 存档数据
-  const { saves, loading: savesLoading, error: savesError } = useSaves(user?.uid);
-  
   // 用户资产
   const { assets, loading: assetsLoading } = useUserAssets(user?.uid);
   
   // 加载状态
-  const isLoading = authLoading || frameworksLoading || savesLoading || assetsLoading;
+  const isLoading = authLoading || assetsLoading;
   
-  // 选中分类
-  const [selectedCategory, setSelectedCategory] = useState<FrameworkCategory>("world");
+  // 选中模块
+  const [activeModule, setActiveModule] = useState<string | null>(null);
   
-  // 处理分类切换
-  const handleCategoryChange = (category: FrameworkCategory) => {
-    setSelectedCategory(category);
+  // 处理导航按钮点击
+  const handleNavigation = (module: string) => {
+    if (module === 'startGame') {
+      // 打开世界选择界面
+      setActiveModule('worldSelection');
+    } else {
+      setActiveModule(module);
+    }
   };
   
   // 页面加载中
@@ -328,24 +338,25 @@ const Lobby: React.FC = () => {
     return <LoadingScreen />;
   }
   
-  // 错误处理
-  if (frameworksError || savesError) {
-    return <ErrorScreen error={frameworksError || savesError} />;
-  }
-  
   return (
     <div className={styles.lobbyContainer}>
       <LobbyHeader assets={assets} />
-      <CategoryTabs 
-        selectedCategory={selectedCategory} 
-        onCategoryChange={handleCategoryChange} 
-      />
-      <div className={styles.mainContent}>
-        <FrameworksPanel 
-          frameworks={frameworks.filter(f => f.category === selectedCategory)} 
-        />
-        <SavesPanel saves={saves} />
-      </div>
+      
+      {/* 根据当前选中模块展示不同内容 */}
+      {activeModule === null && (
+        <NavigationButtons onNavigate={handleNavigation} />
+      )}
+      
+      {activeModule === 'worldSelection' && (
+        <WorldSelectionPanel onBack={() => setActiveModule(null)} />
+      )}
+      
+      {activeModule === 'saves' && (
+        <SavesPanel onBack={() => setActiveModule(null)} />
+      )}
+      
+      {/* 其他模块内容... */}
+      
       <ActionButtons />
       <NotificationSystem />
     </div>
