@@ -446,13 +446,6 @@ const SavesPanel: React.FC<SavesPanelProps> = ({ saves }) => {
 - 关键操作提供撤销选项
 - 支持键盘导航和快捷键
 
-### 6.4 可测试性
-- 组件设计为可测试单元
-- 业务逻辑与UI分离
-- 提供测试钩子和测试ID
-- 状态变更可跟踪和预测
-- 支持组件故事书(Storybook)展示
-
 ## 7. 技术约束
 
 ### 7.1 React相关约束
